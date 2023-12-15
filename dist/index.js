@@ -49758,6 +49758,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const rest_1 = __nccwpck_require__(5375);
 const markdown_link_check_1 = __importDefault(__nccwpck_require__(1454));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const filesUtils_1 = __importDefault(__nccwpck_require__(7058));
 const logUtils_1 = __nccwpck_require__(2585);
 const configUtils_1 = __nccwpck_require__(3757);
@@ -49777,22 +49778,22 @@ exports.createGhIssue = createGhIssue;
 async function run() {
     try {
         // Retrieving inputs from action.yml
-        const repoToken = core.getInput('repo-token', { required: true });
-        const repository = core.getInput('repository', { required: true });
+        const createIssue = core.getInput('create-issue') === 'yes';
+        const repoToken = core.getInput('repo-token', { required: createIssue });
+        const repository = core.getInput('repository', { required: createIssue });
         const [owner, repo] = repository.split('/');
-        if (!owner || !repo) {
+        if (createIssue && (!owner || !repo)) {
             core.setFailed('Invalid repository format. Expected format: owner/repo');
             return;
         }
         const useVerboseModeInput = core.getInput('use-verbose-mode') || 'DEBUG_INFO_WARN_ERROR';
-        const configFile = core.getInput('config-file') || '.markdown-links.json';
+        const configFile = core.getInput('config-file') || './.markdown-links.json';
         const folderPath = core.getInput('folder-path') || '.';
         const maxDepth = parseInt(core.getInput('max-depth'), 10) || -1;
         const checkModifiedFilesOnly = core.getInput('check-modified-files-only') === 'yes';
         const baseBranch = core.getInput('base-branch') || 'master';
         const fileExtension = core.getInput('file-extension') || '.md';
         const filePath = core.getInput('file-path') || '';
-        const createIssue = core.getInput('create-issue') === 'yes';
         const issueTitle = core.getInput('issue-title') ||
             '🔥 Dead {n} Links Found in Markdown Files';
         const ghAssignees = core.getInput('gh-assignees')
@@ -49812,20 +49813,23 @@ async function run() {
         (0, logUtils_1.debug)(`filePath: ${filePath}`);
         (0, logUtils_1.debug)(`createIssue: ${createIssue}`);
         (0, logUtils_1.debug)(`ghAssignees: ${ghAssignees}`);
+        (0, logUtils_1.debug)(`ghLabels: ${ghLabels}`);
         if (isNaN(maxDepth) || maxDepth < -1) {
             (0, logUtils_1.error)(`Invalid value for max-depth. It must be a non-negative integer or -1.`);
             core.setFailed('Invalid value for max-depth. It must be a non-negative integer or -1.');
             return;
         }
         const options = {
-            folderPaths: folderPath.split(',').map(path => path.trim()),
+            folderPaths: folderPath.split(',').map(_fPath => _fPath.trim()),
             fileExtension,
             maxDepth,
             checkModifiedFilesOnly,
             baseBranch,
-            additionalFilePaths: filePath.split(',').map(path => path.trim())
+            additionalFilePaths: filePath
+                .split(',')
+                .map(_fPath => path_1.default.resolve(_fPath.trim()))
         };
-        (0, logUtils_1.info)(`ghAssignees: ${JSON.stringify(options)}`);
+        (0, logUtils_1.info)(`FileCheckOptions options: ${JSON.stringify(options)}`);
         const filesToCheck = await (0, filesUtils_1.default)(options);
         (0, logUtils_1.info)(`Files to check: ${filesToCheck}`);
         const configFilePath = `${process.env.GITHUB_WORKSPACE}/${configFile}`;
@@ -49984,6 +49988,7 @@ const fs_1 = __importDefault(__nccwpck_require__(7147));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const child_process_1 = __nccwpck_require__(2081);
 const util_1 = __nccwpck_require__(3837);
+const logUtils_1 = __nccwpck_require__(2585);
 const readdirAsync = fs_1.default.promises.readdir;
 async function getFiles(dir, fileExtension, maxDepth, currentDepth = 0) {
     if (maxDepth >= 0 && currentDepth > maxDepth) {
@@ -50018,7 +50023,16 @@ async function getFilesToCheck(options) {
         const files = await getFiles(folderPath, options.fileExtension, options.maxDepth);
         allFiles.push(...files);
     }
-    allFiles.push(...options.additionalFilePaths);
+    for (const filePath of options.additionalFilePaths) {
+        // check if file exists
+        (0, logUtils_1.info)(`filePath: ${filePath}`);
+        if (fs_1.default.existsSync(filePath)) {
+            allFiles.push(filePath);
+        }
+        else {
+            (0, logUtils_1.warn)(`File ${filePath} does not exist.`);
+        }
+    }
     if (options.checkModifiedFilesOnly) {
         const modifiedFiles = await getModifiedFiles(options.baseBranch);
         return allFiles.filter(file => modifiedFiles.includes(file));
