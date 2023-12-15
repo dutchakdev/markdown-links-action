@@ -38,11 +38,13 @@ export async function createGhIssue(
 export async function run(): Promise<void> {
   try {
     // Retrieving inputs from action.yml
-    const repoToken = core.getInput('repo-token', { required: true })
-    const repository = core.getInput('repository', { required: true })
+    const createIssue = core.getInput('create-issue') === 'yes'
+
+    const repoToken = core.getInput('repo-token', { required: createIssue })
+    const repository = core.getInput('repository', { required: createIssue })
     const [owner, repo] = repository.split('/')
 
-    if (!owner || !repo) {
+    if (createIssue && (!owner || !repo)) {
       core.setFailed('Invalid repository format. Expected format: owner/repo')
       return
     }
@@ -57,7 +59,6 @@ export async function run(): Promise<void> {
     const baseBranch = core.getInput('base-branch') || 'master'
     const fileExtension = core.getInput('file-extension') || '.md'
     const filePath = core.getInput('file-path') || ''
-    const createIssue = core.getInput('create-issue') === 'yes'
     const issueTitle =
       core.getInput('issue-title') ||
       '🔥 Dead {n} Links Found in Markdown Files'

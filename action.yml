@@ -51,6 +51,14 @@ inputs:
     description: 'Labels for the issue'
     required: false
     default: ''
+  repo-token:
+    description: 'GitHub token'
+    required: true
+    default: ''
+  repository:
+    description: 'GitHub repository (owner/repo)'
+    required: true
+    default: ''
 
 outputs:
   bad-links:

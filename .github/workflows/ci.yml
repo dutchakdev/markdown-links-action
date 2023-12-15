@@ -55,6 +55,8 @@ jobs:
         id: test-action
         uses: ./
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
           folder-path: 'docs'
           file-path: './README.md,./CONTRIBUTING.md'
 
