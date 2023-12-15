@@ -1,13 +1,9 @@
-export interface DeadLink {
-    file: string;
-    link: string;
-    status: number;
-}
+import { DeadLink } from '../types/types'
 
 export function deadLinksToMarkdown(deadLinks: DeadLink[]): string {
-    let markdown = `| File | Link | Status |\n| --- | --- | --- |\n`;
-    deadLinks.forEach((deadLink) => {
-        markdown += `| ${deadLink.file} | ${deadLink.link} | ${deadLink.status} |\n`;
-    });
-    return markdown;
+  let markdown = `| File | Link | Status |\n| --- | --- | --- |\n`
+  for (const deadLink of deadLinks) {
+    markdown += `| ${deadLink.file} | ${deadLink.link} | ${deadLink.status} |\n`
+  }
+  return markdown
 }

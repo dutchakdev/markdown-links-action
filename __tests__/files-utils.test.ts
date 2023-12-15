@@ -1,12 +1,5 @@
-import fs, { read } from 'fs'
-import path from 'path'
-import getFilesToCheck, {
-  FileCheckOptions,
-  getModifiedFiles
-} from '../src/utils/filesUtils'
-import { exec } from 'child_process'
-import type { MockedFunction } from 'jest-mock'
-import { promisify } from 'util'
+import fs from 'fs'
+import getFilesToCheck, { FileCheckOptions } from '../src/utils/filesUtils'
 
 jest.mock('path', () => ({
   resolve: jest.fn((...args) => args.join('/'))
@@ -24,18 +17,20 @@ jest.mock('fs', () => {
 jest.mock('child_process', () => {
   return {
     exec: jest.fn().mockImplementation((command, callback) => {
+      console.log(`Executing command: ${command}`)
       callback(null, { stdout: '' })
     }),
-    __promisify__: jest.fn().mockImplementation(command => {
+    __promisify__: jest.fn().mockImplementation(async command => {
+      console.log(`Executing command: ${command}`)
       return Promise.resolve({ stdout: '' })
     })
   }
 })
 
-const mockedExec = exec as jest.MockedFunction<typeof exec>
-const mockedExecPromise = promisify(exec) as jest.MockedFunction<
-  typeof exec.__promisify__
->
+// const mockedExec = exec as jest.MockedFunction<typeof exec>
+// const mockedExecPromise = promisify(exec) as jest.MockedFunction<
+//   typeof exec.__promisify__
+// >
 
 describe('filesUtils', () => {
   const readdirAsync = fs.promises.readdir as jest.Mock
@@ -71,7 +66,7 @@ describe('filesUtils', () => {
       .mockResolvedValueOnce([{ name: 'subfolder', isDirectory: () => true }])
       .mockResolvedValueOnce([{ name: 'file1.md', isDirectory: () => false }])
 
-    statAsync.mockImplementation(filePath => {
+    statAsync.mockImplementation(async filePath => {
       const isDir = filePath.includes('subfolder')
       return Promise.resolve({ isDirectory: () => isDir })
     })

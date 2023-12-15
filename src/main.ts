@@ -4,15 +4,15 @@ import markdownLinkCheck from 'markdown-link-check'
 import fs from 'fs'
 import getFilesToCheck, { FileCheckOptions } from './utils/filesUtils'
 import {
-  Verbosity,
   info as _info,
-  warn as _warn,
   error as _error,
   debug as _debug,
-  parseVerbosityInput
+  parseVerbosityInput,
+  Verbosity
 } from './utils/logUtils'
 import { validateAndGetConfig } from './utils/configUtils'
-import { DeadLink, deadLinksToMarkdown } from './utils/deadLinks'
+import { deadLinksToMarkdown } from './utils/deadLinks'
+import { DeadLink } from './types/types'
 
 const readFileAsync = fs.promises.readFile
 
@@ -70,16 +70,16 @@ export async function run(): Promise<void> {
 
     const useVerboseMode: Verbosity = parseVerbosityInput(useVerboseModeInput)
 
-    _info(`useVerboseMode: ${useVerboseMode}`)
-    _info(`configFile: ${configFile}`)
-    _info(`folderPath: ${folderPath}`)
-    _info(`maxDepth: ${maxDepth}`)
-    _info(`checkModifiedFilesOnly: ${checkModifiedFilesOnly}`)
-    _info(`baseBranch: ${baseBranch}`)
-    _info(`fileExtension: ${fileExtension}`)
-    _info(`filePath: ${filePath}`)
-    _info(`createIssue: ${createIssue}`)
-    _info(`ghAssignees: ${ghAssignees}`)
+    _debug(`useVerboseMode: ${useVerboseMode}`)
+    _debug(`configFile: ${configFile}`)
+    _debug(`folderPath: ${folderPath}`)
+    _debug(`maxDepth: ${maxDepth}`)
+    _debug(`checkModifiedFilesOnly: ${checkModifiedFilesOnly}`)
+    _debug(`baseBranch: ${baseBranch}`)
+    _debug(`fileExtension: ${fileExtension}`)
+    _debug(`filePath: ${filePath}`)
+    _debug(`createIssue: ${createIssue}`)
+    _debug(`ghAssignees: ${ghAssignees}`)
 
     if (isNaN(maxDepth) || maxDepth < -1) {
       _error(
@@ -109,29 +109,30 @@ export async function run(): Promise<void> {
     const config = await validateAndGetConfig(configFilePath)
 
     const deadLinks: DeadLink[] = []
-    filesToCheck.forEach(async file => {
+    for (const file of filesToCheck) {
       const fileContent = await readFileAsync(file, 'utf8')
-      const links = await markdownLinkCheck(
-        fileContent,
-        config,
-        (err, results) => {
-          if (err) {
-            _error(`Error while checking links in file ${file}. Error: ${err}`)
-            return
-          }
-          results.forEach(result => {
-            if (result.status === 'dead') {
-              let link: DeadLink = {
-                file: file,
-                link: result.link,
-                status: result.status
-              }
-              deadLinks.push(link)
-            }
-          })
+      markdownLinkCheck(fileContent, config, (err, results) => {
+        if (err) {
+          _error(`Error while checking links in file ${file}. Error: ${err}`)
+          return
         }
-      )
-    })
+        for (const result of results) {
+          if (result.statusCode !== 200) {
+            const link: DeadLink = {
+              file,
+              link: result.link,
+              statusCode: result.statusCode,
+              status: result.status,
+              error: result.error
+            }
+            deadLinks.push(link)
+          }
+        }
+      })
+    }
+
+    // Set output
+    core.setOutput('dead-links', JSON.stringify(deadLinks))
 
     if (createIssue) {
       try {

@@ -42,6 +42,7 @@ rules:
     'i18n-text/no-en': 'off',
     'import/no-namespace': 'off',
     'no-console': 'off',
+    'no-shadow': ["warn"],
     'no-unused-vars': 'off',
     'prettier/prettier': 'error',
     'semi': 'off',

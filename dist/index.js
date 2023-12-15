@@ -49802,16 +49802,16 @@ async function run() {
             ? core.getInput('gh-labels').split(',')
             : [];
         const useVerboseMode = (0, logUtils_1.parseVerbosityInput)(useVerboseModeInput);
-        (0, logUtils_1.info)(`useVerboseMode: ${useVerboseMode}`);
-        (0, logUtils_1.info)(`configFile: ${configFile}`);
-        (0, logUtils_1.info)(`folderPath: ${folderPath}`);
-        (0, logUtils_1.info)(`maxDepth: ${maxDepth}`);
-        (0, logUtils_1.info)(`checkModifiedFilesOnly: ${checkModifiedFilesOnly}`);
-        (0, logUtils_1.info)(`baseBranch: ${baseBranch}`);
-        (0, logUtils_1.info)(`fileExtension: ${fileExtension}`);
-        (0, logUtils_1.info)(`filePath: ${filePath}`);
-        (0, logUtils_1.info)(`createIssue: ${createIssue}`);
-        (0, logUtils_1.info)(`ghAssignees: ${ghAssignees}`);
+        (0, logUtils_1.debug)(`useVerboseMode: ${useVerboseMode}`);
+        (0, logUtils_1.debug)(`configFile: ${configFile}`);
+        (0, logUtils_1.debug)(`folderPath: ${folderPath}`);
+        (0, logUtils_1.debug)(`maxDepth: ${maxDepth}`);
+        (0, logUtils_1.debug)(`checkModifiedFilesOnly: ${checkModifiedFilesOnly}`);
+        (0, logUtils_1.debug)(`baseBranch: ${baseBranch}`);
+        (0, logUtils_1.debug)(`fileExtension: ${fileExtension}`);
+        (0, logUtils_1.debug)(`filePath: ${filePath}`);
+        (0, logUtils_1.debug)(`createIssue: ${createIssue}`);
+        (0, logUtils_1.debug)(`ghAssignees: ${ghAssignees}`);
         if (isNaN(maxDepth) || maxDepth < -1) {
             (0, logUtils_1.error)(`Invalid value for max-depth. It must be a non-negative integer or -1.`);
             core.setFailed('Invalid value for max-depth. It must be a non-negative integer or -1.');
@@ -49831,30 +49831,32 @@ async function run() {
         const configFilePath = `${process.env.GITHUB_WORKSPACE}/${configFile}`;
         const config = await (0, configUtils_1.validateAndGetConfig)(configFilePath);
         const deadLinks = [];
-        filesToCheck.forEach(async (file) => {
+        for (const file of filesToCheck) {
             const fileContent = await readFileAsync(file, 'utf8');
-            const links = await (0, markdown_link_check_1.default)(fileContent, config, (err, results) => {
+            (0, markdown_link_check_1.default)(fileContent, config, (err, results) => {
                 if (err) {
                     (0, logUtils_1.error)(`Error while checking links in file ${file}. Error: ${err}`);
                     return;
                 }
-                results.forEach(result => {
-                    if (result.status === 'dead') {
-                        let link = {
-                            file: file,
+                for (const result of results) {
+                    if (result.statusCode !== 200) {
+                        const link = {
+                            file,
                             link: result.link,
-                            status: result.status
+                            statusCode: result.statusCode,
+                            status: result.status,
+                            error: result.error
                         };
                         deadLinks.push(link);
                     }
-                });
+                }
             });
-        });
+        }
+        // Set output
+        core.setOutput('dead-links', JSON.stringify(deadLinks));
         if (createIssue) {
             try {
                 const octokit = new rest_1.Octokit({ auth: repoToken });
-                // modify const issueBody = deadLinksToMarkdown(deadLinks); with reading custom header for issue body
-                // if .mdl-issue-header.md exists, read it and prepend it to the issue body if not, use the default
                 let issueBody = (0, deadLinks_1.deadLinksToMarkdown)(deadLinks);
                 const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`;
                 const issueHeader = await readFileAsync(issueHeaderPath, 'utf8');
@@ -49874,7 +49876,6 @@ async function run() {
         }
     }
     catch (error) {
-        // Fail the workflow run if an error occurs
         if (error instanceof Error) {
             (0, logUtils_1.error)(error.message);
             core.setFailed(error.message);
@@ -49959,9 +49960,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deadLinksToMarkdown = void 0;
 function deadLinksToMarkdown(deadLinks) {
     let markdown = `| File | Link | Status |\n| --- | --- | --- |\n`;
-    deadLinks.forEach((deadLink) => {
+    for (const deadLink of deadLinks) {
         markdown += `| ${deadLink.file} | ${deadLink.link} | ${deadLink.status} |\n`;
-    });
+    }
     return markdown;
 }
 exports.deadLinksToMarkdown = deadLinksToMarkdown;
@@ -49984,23 +49985,26 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const child_process_1 = __nccwpck_require__(2081);
 const util_1 = __nccwpck_require__(3837);
 const readdirAsync = fs_1.default.promises.readdir;
-const statAsync = fs_1.default.promises.stat;
 async function getFiles(dir, fileExtension, maxDepth, currentDepth = 0) {
     if (maxDepth >= 0 && currentDepth > maxDepth) {
         return [];
     }
     const dirents = await readdirAsync(dir, { withFileTypes: true });
-    const files = await Promise.all(dirents.map((dirent) => {
+    const files = await Promise.all(dirents.map(async (dirent) => {
         const res = path_1.default.resolve(dir, dirent.name);
-        return dirent.isDirectory() ? getFiles(res, fileExtension, maxDepth, currentDepth + 1) : res;
+        return dirent.isDirectory()
+            ? getFiles(res, fileExtension, maxDepth, currentDepth + 1)
+            : res;
     }));
-    return Array.prototype.concat(...files).filter(file => file.endsWith(fileExtension));
+    return Array.prototype
+        .concat(...files)
+        .filter(file => file.endsWith(fileExtension));
 }
 async function getModifiedFiles(baseBranch) {
     const execAsync = (0, util_1.promisify)(child_process_1.exec);
     try {
         const { stdout } = await execAsync(`git diff --name-only ${baseBranch}`);
-        return stdout.split('\n').filter(line => line); // Remove empty lines
+        return stdout.split('\n').filter(line => line);
     }
     catch (error) {
         console.error('Error occurred while getting modified files:', error);
@@ -50040,16 +50044,14 @@ var LogLevel;
     LogLevel["ERROR"] = "ERROR";
     LogLevel["DEBUG"] = "DEBUG";
 })(LogLevel || (exports.LogLevel = LogLevel = {}));
-// Define the verbosity levels
 var Verbosity;
 (function (Verbosity) {
     Verbosity[Verbosity["SILENT"] = 0] = "SILENT";
     Verbosity[Verbosity["ERROR_ONLY"] = 1] = "ERROR_ONLY";
     Verbosity[Verbosity["WARN_AND_ERROR"] = 2] = "WARN_AND_ERROR";
     Verbosity[Verbosity["INFO_WARN_ERROR"] = 3] = "INFO_WARN_ERROR";
-    Verbosity[Verbosity["DEBUG_INFO_WARN_ERROR"] = 4] = "DEBUG_INFO_WARN_ERROR"; // Debug, info, warning, and error messages
+    Verbosity[Verbosity["DEBUG_INFO_WARN_ERROR"] = 4] = "DEBUG_INFO_WARN_ERROR";
 })(Verbosity || (exports.Verbosity = Verbosity = {}));
-// Set the current verbosity level (you can change this dynamically)
 exports.currentVerbosity = Verbosity.DEBUG_INFO_WARN_ERROR;
 function parseVerbosityInput(inputValue) {
     switch (inputValue.toUpperCase()) {
@@ -50064,8 +50066,7 @@ function parseVerbosityInput(inputValue) {
         case 'DEBUG_INFO_WARN_ERROR':
             return Verbosity.DEBUG_INFO_WARN_ERROR;
         default:
-            // Handle the default case, e.g., setting it to a default value or throwing an error
-            return Verbosity.DEBUG_INFO_WARN_ERROR; // Change this to your default value
+            return Verbosity.DEBUG_INFO_WARN_ERROR;
     }
 }
 exports.parseVerbosityInput = parseVerbosityInput;
@@ -50092,7 +50093,8 @@ function error(message) {
 }
 exports.error = error;
 function debug(message) {
-    if (exports.currentVerbosity >= Verbosity.DEBUG_INFO_WARN_ERROR && process.env.DEBUG) {
+    if (exports.currentVerbosity >= Verbosity.DEBUG_INFO_WARN_ERROR &&
+        process.env.DEBUG) {
         log(LogLevel.DEBUG, message);
     }
 }
