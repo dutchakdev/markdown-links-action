@@ -95,12 +95,14 @@ export async function run(): Promise<void> {
     }
 
     const options: FileCheckOptions = {
-      folderPaths: folderPath.split(',').map(path => path.trim()),
+      folderPaths: folderPath.split(',').map(_fPath => _fPath.trim()),
       fileExtension,
       maxDepth,
       checkModifiedFilesOnly,
       baseBranch,
-      additionalFilePaths: filePath.split(',').map(filePath => path.resolve(filePath.trim()))
+      additionalFilePaths: filePath
+        .split(',')
+        .map(_fPath => path.resolve(_fPath.trim()))
     }
 
     _info(`FileCheckOptions options: ${JSON.stringify(options)}`)
