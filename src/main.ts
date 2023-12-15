@@ -138,7 +138,7 @@ export async function run(): Promise<void> {
     }
 
     _info(`Dead links: ${JSON.stringify(deadLinks)}`)
-    
+
     // Set output
     core.setOutput('dead-links', JSON.stringify(deadLinks))
 
