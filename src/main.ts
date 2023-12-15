@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import { Octokit } from '@octokit/rest'
 import markdownLinkCheck from 'markdown-link-check'
 import fs from 'fs'
+import path from 'path'
 import getFilesToCheck, { FileCheckOptions } from './utils/filesUtils'
 import {
   info as _info,
@@ -99,10 +100,10 @@ export async function run(): Promise<void> {
       maxDepth,
       checkModifiedFilesOnly,
       baseBranch,
-      additionalFilePaths: filePath.split(',').map(path => path.trim())
+      additionalFilePaths: filePath.split(',').map(filePath => path.resolve(filePath.trim()))
     }
 
-    _info(`ghAssignees: ${JSON.stringify(options)}`)
+    _info(`FileCheckOptions options: ${JSON.stringify(options)}`)
     const filesToCheck = await getFilesToCheck(options)
 
     _info(`Files to check: ${filesToCheck}`)

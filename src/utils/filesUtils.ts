@@ -60,9 +60,8 @@ async function getFilesToCheck(options: FileCheckOptions): Promise<string[]> {
     )
     allFiles.push(...files)
   }
-  for (const filePath of options.additionalFilePaths) {
-    allFiles.push(path.resolve(filePath))
-  }
+
+  allFiles.push(...options.additionalFilePaths)
 
   if (options.checkModifiedFilesOnly) {
     const modifiedFiles = await getModifiedFiles(options.baseBranch)
