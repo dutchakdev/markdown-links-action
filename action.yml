@@ -30,7 +30,7 @@ inputs:
   base-branch:
     description: 'Use this to specify the base branch against which the action finds the modififed files.'
     required: true
-    default: 'master'
+    default: 'main'
   file-extension:
     description: 'Use this to specify the file extension of Markdown files.'
     required: true
