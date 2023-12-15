@@ -1,0 +1,8 @@
+{
+    "issue_title": "🔥 Dead {n} Links Found in Markdown Files",
+    "ignorePatterns": [
+        {
+            "pattern": "^http://ignored-domain.com"
+        }
+    ]
+}

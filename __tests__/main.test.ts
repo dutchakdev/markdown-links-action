@@ -1,89 +1,75 @@
-/**
- * Unit tests for the action's main functionality, src/main.ts
- *
- * These should be run as if the action was called from a workflow.
- * Specifically, the inputs listed in `action.yml` should be set as environment
- * variables following the pattern `INPUT_<INPUT_NAME>`.
- */
-
 import * as core from '@actions/core'
-import * as main from '../src/main'
+import { run } from '../src/main' // Replace with the actual path
+import { Octokit } from '@octokit/rest'
+import fs from 'fs'
+import markdownLinkCheck from 'markdown-link-check'
 
-// Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
+jest.mock('@actions/core')
+jest.mock('fs', () => {
+  return {
+    promises: {
+      readFile: jest.fn().mockResolvedValue('Mock file content')
+    }
+  }
+})
+jest.mock('markdown-link-check')
+jest.mock('@octokit/rest', () => ({
+  Octokit: jest.fn()
+}))
 
-// Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
-
-// Mock the GitHub Actions core library
-let debugMock: jest.SpyInstance
-let errorMock: jest.SpyInstance
-let getInputMock: jest.SpyInstance
-let setFailedMock: jest.SpyInstance
-let setOutputMock: jest.SpyInstance
-
-describe('action', () => {
+describe('run', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-
-    debugMock = jest.spyOn(core, 'debug').mockImplementation()
-    errorMock = jest.spyOn(core, 'error').mockImplementation()
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
-    setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
   })
 
-  it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation((name: string): string => {
+  it('should execute without errors', async () => {
+    jest.spyOn(core, 'getInput').mockImplementation(name => {
       switch (name) {
-        case 'milliseconds':
-          return '500'
+        case 'repo-token':
+          return 'mock-token'
+        case 'repository':
+          return 'mock-owner/mock-repo'
+        case 'use-quiet-mode':
+          return 'no'
+        case 'use-verbose-mode':
+          return 'no'
+        case 'config-file':
+          return 'mlc_config.json'
+        case 'folder-path':
+          return '.'
+        case 'max-depth':
+          return '-1'
+        case 'check-modified-files-only':
+          return 'no'
+        case 'base-branch':
+          return 'master'
+        case 'file-extension':
+          return '.md'
+        case 'file-path':
+          return ''
+        case 'create-issue':
+          return 'no'
+        case 'gh-assignees':
+          return ''
+        case 'gh-labels':
+          return ''
         default:
           return ''
       }
     })
 
-    await main.run()
-    expect(runMock).toHaveReturned()
+    const mockOctokit = {} as unknown as Octokit // Mock Octokit instance
 
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
-    expect(debugMock).toHaveBeenNthCalledWith(
-      2,
-      expect.stringMatching(timeRegex)
-    )
-    expect(debugMock).toHaveBeenNthCalledWith(
-      3,
-      expect.stringMatching(timeRegex)
-    )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      expect.stringMatching(timeRegex)
-    )
-    expect(errorMock).not.toHaveBeenCalled()
+    await run()
   })
 
-  it('sets a failed status', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation((name: string): string => {
-      switch (name) {
-        case 'milliseconds':
-          return 'this is not a number'
-        default:
-          return ''
-      }
+  it('should handle errors', async () => {
+    jest.spyOn(core, 'getInput').mockImplementation(() => {
+      throw new Error('Mock error')
     })
 
-    await main.run()
-    expect(runMock).toHaveReturned()
+    await run()
 
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds not a number'
-    )
-    expect(errorMock).not.toHaveBeenCalled()
+    expect(core.setFailed).toHaveBeenCalledWith('Mock error')
   })
 })

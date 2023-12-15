@@ -1,26 +1,170 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+import { Octokit } from '@octokit/rest'
+import markdownLinkCheck from 'markdown-link-check'
+import fs from 'fs'
+import getFilesToCheck, { FileCheckOptions } from './utils/filesUtils'
+import {
+  Verbosity,
+  info as _info,
+  warn as _warn,
+  error as _error,
+  debug as _debug,
+  parseVerbosityInput
+} from './utils/logUtils'
+import { validateAndGetConfig } from './utils/configUtils'
+import { DeadLink, deadLinksToMarkdown } from './utils/deadLinks'
 
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
+const readFileAsync = fs.promises.readFile
+
+export async function createGhIssue(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  title: string,
+  body: string,
+  assignees: string[],
+  labels: string[]
+): Promise<void> {
+  await octokit.issues.create({
+    owner,
+    repo,
+    title,
+    body,
+    assignees,
+    labels
+  })
+}
+
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    // Retrieving inputs from action.yml
+    const repoToken = core.getInput('repo-token', { required: true })
+    const repository = core.getInput('repository', { required: true })
+    const [owner, repo] = repository.split('/')
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    if (!owner || !repo) {
+      core.setFailed('Invalid repository format. Expected format: owner/repo')
+      return
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const useVerboseModeInput =
+      core.getInput('use-verbose-mode') || 'DEBUG_INFO_WARN_ERROR'
+    const configFile = core.getInput('config-file') || '.markdown-links.json'
+    const folderPath = core.getInput('folder-path') || '.'
+    const maxDepth = parseInt(core.getInput('max-depth'), 10) || -1
+    const checkModifiedFilesOnly =
+      core.getInput('check-modified-files-only') === 'yes'
+    const baseBranch = core.getInput('base-branch') || 'master'
+    const fileExtension = core.getInput('file-extension') || '.md'
+    const filePath = core.getInput('file-path') || ''
+    const createIssue = core.getInput('create-issue') === 'yes'
+    const issueTitle =
+      core.getInput('issue-title') ||
+      '🔥 Dead {n} Links Found in Markdown Files'
+    const ghAssignees = core.getInput('gh-assignees')
+      ? core.getInput('gh-assignees').split(',')
+      : []
+    const ghLabels = core.getInput('gh-labels')
+      ? core.getInput('gh-labels').split(',')
+      : []
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    const useVerboseMode: Verbosity = parseVerbosityInput(useVerboseModeInput)
+
+    _info(`useVerboseMode: ${useVerboseMode}`)
+    _info(`configFile: ${configFile}`)
+    _info(`folderPath: ${folderPath}`)
+    _info(`maxDepth: ${maxDepth}`)
+    _info(`checkModifiedFilesOnly: ${checkModifiedFilesOnly}`)
+    _info(`baseBranch: ${baseBranch}`)
+    _info(`fileExtension: ${fileExtension}`)
+    _info(`filePath: ${filePath}`)
+    _info(`createIssue: ${createIssue}`)
+    _info(`ghAssignees: ${ghAssignees}`)
+
+    if (isNaN(maxDepth) || maxDepth < -1) {
+      _error(
+        `Invalid value for max-depth. It must be a non-negative integer or -1.`
+      )
+      core.setFailed(
+        'Invalid value for max-depth. It must be a non-negative integer or -1.'
+      )
+      return
+    }
+
+    const options: FileCheckOptions = {
+      folderPaths: folderPath.split(',').map(path => path.trim()),
+      fileExtension,
+      maxDepth,
+      checkModifiedFilesOnly,
+      baseBranch,
+      additionalFilePaths: filePath.split(',').map(path => path.trim())
+    }
+
+    _info(`ghAssignees: ${JSON.stringify(options)}`)
+    const filesToCheck = await getFilesToCheck(options)
+
+    _info(`Files to check: ${filesToCheck}`)
+
+    const configFilePath = `${process.env.GITHUB_WORKSPACE}/${configFile}`
+    const config = await validateAndGetConfig(configFilePath)
+
+    const deadLinks: DeadLink[] = []
+    filesToCheck.forEach(async file => {
+      const fileContent = await readFileAsync(file, 'utf8')
+      const links = await markdownLinkCheck(
+        fileContent,
+        config,
+        (err, results) => {
+          if (err) {
+            _error(`Error while checking links in file ${file}. Error: ${err}`)
+            return
+          }
+          results.forEach(result => {
+            if (result.status === 'dead') {
+              let link: DeadLink = {
+                file: file,
+                link: result.link,
+                status: result.status
+              }
+              deadLinks.push(link)
+            }
+          })
+        }
+      )
+    })
+
+    if (createIssue) {
+      try {
+        const octokit = new Octokit({ auth: repoToken })
+        let issueBody = deadLinksToMarkdown(deadLinks)
+        const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`
+        const issueHeader = await readFileAsync(issueHeaderPath, 'utf8')
+        if (issueHeader) {
+          issueBody = issueHeader + issueBody
+        }
+        _info(`issueBody: ${issueBody}`)
+
+        await createGhIssue(
+          octokit,
+          owner,
+          repo,
+          issueTitle.replace('{n}', deadLinks.length.toString()),
+          issueBody,
+          ghAssignees,
+          ghLabels
+        )
+        _info(`Issue created successfully 🤙`)
+      } catch (error) {
+        if (error instanceof Error) {
+          _error(`Error while creating issue: ${error.message}`)
+          core.setFailed(error.message)
+        }
+      }
+    }
   } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      _error(error.message)
+      core.setFailed(error.message)
+    }
   }
 }
