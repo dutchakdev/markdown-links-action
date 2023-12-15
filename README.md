@@ -1,6 +1,9 @@
 # Markdown Links Action
 
-The Markdown Links Action automates the process of validating links in Markdown files within a GitHub repository. It ensures all hyperlinks in your documentation are functional and up-to-date, maintaining the integrity and reliability of your project's documentation.
+The Markdown Links Action automates the process of validating links in Markdown 
+files within a GitHub repository. It ensures all hyperlinks in your 
+documentation are functional and up-to-date, maintaining the integrity and 
+reliability of your project's documentation.
 
 ## Configuration Variables
 
