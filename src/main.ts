@@ -116,6 +116,7 @@ export async function run(): Promise<void> {
     const deadLinks: DeadLink[] = []
     for (const file of filesToCheck) {
       const fileContent = await readFileAsync(file, 'utf8')
+      _info(`Checking links in file ${file}`)
       markdownLinkCheck(fileContent, config, (err, results) => {
         if (err) {
           _error(`Error while checking links in file ${file}. Error: ${err}`)
@@ -136,6 +137,8 @@ export async function run(): Promise<void> {
       })
     }
 
+    _info(`Dead links: ${JSON.stringify(deadLinks)}`)
+    
     // Set output
     core.setOutput('dead-links', JSON.stringify(deadLinks))
 
