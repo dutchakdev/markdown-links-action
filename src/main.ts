@@ -51,7 +51,7 @@ export async function run(): Promise<void> {
 
     const useVerboseModeInput =
       core.getInput('use-verbose-mode') || 'DEBUG_INFO_WARN_ERROR'
-    const configFile = core.getInput('config-file') || '.markdown-links.json'
+    const configFile = core.getInput('config-file') || './.markdown-links.json'
     const folderPath = core.getInput('folder-path') || '.'
     const maxDepth = parseInt(core.getInput('max-depth'), 10) || -1
     const checkModifiedFilesOnly =

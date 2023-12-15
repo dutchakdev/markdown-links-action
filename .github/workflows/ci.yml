@@ -57,6 +57,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
+          use-verbose-mode: 'yes'
           folder-path: 'docs'
           file-path: './README.md,./CONTRIBUTING.md'
 

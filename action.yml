@@ -14,7 +14,7 @@ inputs:
   config-file:
     description: 'Specify path to a markdown-link-check JSON configuration file.'
     required: true
-    default: 'mlc_config.json'
+    default: '.markdown-links.json'
   folder-path:
     description: 'Specify path to a custom folder where your markdown files are located.'
     required: true
