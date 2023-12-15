@@ -80,6 +80,7 @@ export async function run(): Promise<void> {
     _debug(`filePath: ${filePath}`)
     _debug(`createIssue: ${createIssue}`)
     _debug(`ghAssignees: ${ghAssignees}`)
+    _debug(`ghLabels: ${ghLabels}`)
 
     if (isNaN(maxDepth) || maxDepth < -1) {
       _error(

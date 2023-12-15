@@ -59,9 +59,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: your-username/markdown-links-action@v1
+    - uses: dutchakdev/markdown-links-action@v1
       with:
-        use-quiet-mode: 'yes'
         check-modified-files-only: 'yes'
 ```
 
@@ -77,10 +76,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: your-username/markdown-links-action@v1
+    - uses: dutchakdev/markdown-links-action@v1
       with:
-        folder-path: 'docs, blog'
-        file-path: './README.md, ./CONTRIBUTING.md'
+        folder-path: 'docs'
+        file-path: './README.md,./CONTRIBUTING.md'
 ```
 
 ## Tips and Notes
