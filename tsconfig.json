@@ -16,7 +16,7 @@
     "newLine": "lf",
     "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage"],
+  "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage", "./release.config.js"],
   "include": [
     "src/**/*",
     "node_modules/await-semaphore/**/*"

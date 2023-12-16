@@ -1,5 +1,5 @@
 name: 'markdown-links-action'
-description: 'Markdown Link Checker, automates the process of validating links in Markdown files within a GitHub repository. It ensures that all hyperlinks in your documentation are functional and up-to-date, helping maintain the integrity and reliability of your project documentation.'
+description: 'Markdown Link Checker, automates the process of validating links in Markdown files within a GitHub repository.'
 author: 'Roman Dutchak'
 
 branding:

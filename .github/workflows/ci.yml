@@ -17,7 +17,7 @@ jobs:
 
   #   steps:
   #     - name: Checkout
-  #       id: checkoutho
+  #       id: checkout
   #       uses: actions/checkout@v4
 
   #     - name: Setup Node.js
@@ -58,12 +58,13 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
+          use-verbose-mode: 'yes'
           folder-path: 'docs'
           file-path: './README.md,./CONTRIBUTING.md'
           create-issue: 'yes'
           gh-assignees: 'dutchakdev'
           gh-labels: 'dead-links'
 
-      # - name: Print Output
-      #   id: output
-      #   run: echo "${{ steps.test-action.outputs.dead-links }}"
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.dead-links }}"

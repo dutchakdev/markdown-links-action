@@ -55,10 +55,22 @@ export const createLinkProcessor = (file: string): Transform => {
   })
 }
 
+const renderBadge = (code: number): string => {
+  if (code === 200) {
+    return '![](https://img.shields.io/badge/_200-green)'
+  } else if (code === 0) {
+    return '![](https://img.shields.io/badge/_ERR-red)'
+  } else {
+    return `![](https://img.shields.io/badge/_${code}-red)`
+  }
+}
+
 export const deadLinksToMarkdown = (deadLinks: DeadLink[]): string => {
   const markdownLines = deadLinks.map(
     deadLink =>
-      `| ${deadLink.file} | ${deadLink.link} | ${deadLink.statusCode} | ${deadLink.statusEmo} |\n`
+      `| ${deadLink.file} | ${deadLink.link} | ${renderBadge(
+        deadLink.statusCode
+      )} | ${deadLink.statusEmo} |\n`
   )
 
   return `## Dead links\n| File | Link | Status | Emoji |\n| --- | --- | --- | --- |\n${markdownLines.join(
@@ -121,9 +133,8 @@ export const checkWebLink = async (
 export const checkLinks = async (
   file: string,
   concurrency = 5
-): Promise<{ deadLinks: DeadLink[]; relativeLinks: string[] }> => {
+): Promise<{ deadLinks: DeadLink[] }> => {
   const deadLinks: DeadLink[] = []
-  const relativeLinks: string[] = []
   const semaphore = new Semaphore(concurrency)
   const linkProcessor = createLinkProcessor(file)
 
@@ -148,7 +159,7 @@ export const checkLinks = async (
             if (deadLink) {
               deadLinks.push(deadLink)
             }
-          } else {
+          } else if (!linkFilePair.link.startsWith('#')) {
             const directoryPath = path.dirname(linkFilePair.file)
             const relativeFilePath = path.join(directoryPath, linkFilePair.link)
             const exists = await fileExists(relativeFilePath)
@@ -161,8 +172,6 @@ export const checkLinks = async (
                 statusEmo: '🌚',
                 error: 'File not found.'
               })
-            } else {
-              relativeLinks.push(linkFilePair.link)
             }
           }
         })
@@ -174,7 +183,7 @@ export const checkLinks = async (
     }
 
     stream.on('data', handleDataEvent)
-    stream.on('end', () => resolve({ deadLinks, relativeLinks }))
+    stream.on('end', () => resolve({ deadLinks }))
     stream.on('error', err => reject(err))
   })
 }

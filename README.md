@@ -1,128 +1,130 @@
-<h1 align="center">
-  <br>
-  <img src="https://path_to_your_project_logo/logo.png" alt="Markdown Links Action Logo" width="200">
-  <br>
-  Markdown Links Action
-  <br>
-</h1>
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://vshymanskyy.github.io/StandWithUkraine/)
 
-<h4 align="center">A GitHub Action for validating links in Markdown files.</h4>
+  <h1 align="center">
+    <br>
+    <img src="./assets/octocat.png" alt="Markdown Links Action Logo" width="200">
+    <br>
+    Markdown Links Action
+    <br>
+  </h1>
 
-<p align="center">
-  <a href="https://github.com/your_username/markdown-links-action/releases">
-    <img src="https://img.shields.io/github/v/release/your_username/markdown-links-action?style=flat-square">
-  </a>
-  <a href="https://github.com/your_username/markdown-links-action/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/your_username/markdown-links-action?style=flat-square">
-  </a>
-</p>
+  <h4 align="center">A GitHub Action for validating links in Markdown files.</h4>
 
-<p align="center">
-  <a href="#overview">Overview</a> •
-  <a href="#features">Features</a> •
-  <a href="#configuration">Configuration</a> •
-  <a href="#usage-examples">Usage Examples</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="#license">License</a>
-</p>
+  <p align="center">
+    <a href="https://github.com/your_username/markdown-links-action/releases">
+      <img src="https://img.shields.io/github/v/release/your_username/markdown-links-action?style=flat-square">
+    </a>
+    <a href="https://github.com/your_username/markdown-links-action/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/your_username/markdown-links-action?style=flat-square">
+    </a>
+  </p>
 
----
+  <p align="center">
+    <a href="#overview">Overview</a> •
+    <a href="#features">Features</a> •
+    <a href="#configuration">Configuration</a> •
+    <a href="#usage-examples">Usage Examples</a> •
+    <a href="#contributing">Contributing</a> •
+    <a href="#license">License</a>
+  </p>
 
-## :clipboard: Overview
+  ---
 
-The Markdown Links Action automates the process of validating links in Markdown files within a GitHub repository, ensuring all hyperlinks in your documentation are functional and up-to-date.
+  ## :clipboard: Overview
 
-## :sparkles: Features
+  The Markdown Links Action automates the process of validating links in Markdown files within a GitHub repository, ensuring all hyperlinks in your documentation are functional and up-to-date.
 
-- **Link Validation:** Checks hyperlinks in Markdown files for validity.
-- **Customizable Folder Paths:** Specify directories to check for Markdown files.
-- **PR Specific Checks:** Option to check only modified files in pull requests.
-- **Issue Creation:** Ability to create GitHub issues for broken links.
-- **Flexible Configuration:** Configure various aspects of the action according to your project's needs.
+  ## :sparkles: Features
 
-## :gear: Configuration
+  - **Link Validation:** Checks hyperlinks in Markdown files for validity.
+  - **Customizable Folder Paths:** Specify directories to check for Markdown files.
+  - **PR Specific Checks:** Option to check only modified files in pull requests.
+  - **Issue Creation:** Ability to create GitHub issues for broken links.
+  - **Flexible Configuration:** Configure various aspects of the action according to your project's needs.
 
-Configure the action using these inputs:
+  ## :gear: Configuration
 
-| Input                        | Description                                     | Required | Default Value       |
-|------------------------------|-------------------------------------------------|----------|---------------------|
-| `folder-path`                | Custom folder path for Markdown files.          | Yes      | `.`                 |
-| `max-depth`                  | Maximum depth for directory checks.             | Yes      | `-1`                |
-| `check-modified-files-only`  | Check only modified files if set to `yes`.      | Yes      | `no`                |
-| `base-branch`                | Base branch for comparing changes in PRs.       | Yes      | `main`              |
-| `file-extension`             | File extension of Markdown files to check.      | Yes      | `.md`               |
-| `file-path`                  | Additional specific files to check.             | Yes      |                     |
-| `create-issue`               | Create issue for broken links if set to `yes`.  | Yes      | `no`                |
-| `gh-assignees`               | Assignees for the created issues.               | No       |                     |
-| `gh-labels`                  | Labels for the created issues.                  | No       |                     |
-| `repo-token`                 | GitHub token for authentication.                | Yes      |                     |
-| `repository`                 | GitHub repository in the format `owner/repo`.   | Yes      |                     |
+  Configure the action using these inputs:
 
-## :zap: Usage Examples
+  | Input                        | Description                                     | Required | Default Value       |
+  |------------------------------|-------------------------------------------------|----------|---------------------|
+  | `folder-path`                | Custom folder path for Markdown files.          | Yes      | `.`                 |
+  | `max-depth`                  | Maximum depth for directory checks.             | Yes      | `-1`                |
+  | `check-modified-files-only`  | Check only modified files if set to `yes`.      | Yes      | `no`                |
+  | `base-branch`                | Base branch for comparing changes in PRs.       | Yes      | `main`              |
+  | `file-extension`             | File extension of Markdown files to check.      | Yes      | `.md`               |
+  | `file-path`                  | Additional specific files to check.             | Yes      |                     |
+  | `create-issue`               | Create issue for broken links if set to `yes`.  | Yes      | `no`                |
+  | `gh-assignees`               | Assignees for the created issues.               | No       |                     |
+  | `gh-labels`                  | Labels for the created issues.                  | No       |                     |
+  | `repo-token`                 | GitHub token for authentication.                | Yes      |                     |
+  | `repository`                 | GitHub repository in the format `owner/repo`.   | Yes      |                     |
 
-### Basic Usage
+  ## :zap: Usage Examples
 
-Check links in all Markdown files in the repository:
+  ### Basic Usage
 
-```yml
-on: [push, pull_request]
-name: Markdown Link Check
-jobs:
-  linkCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: your_username/markdown-links-action@v1
-```
+  Check links in all Markdown files in the repository:
 
-### Custom Folder Path
+  ```yml
+  on: [push, pull_request]
+  name: Markdown Link Check
+  jobs:
+    linkCheck:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: your_username/markdown-links-action@v1
+  ```
 
-Check links only in the `docs` directory:
+  ### Custom Folder Path
 
-```yml
-on: [push, pull_request]
-name: Check Docs Links
-jobs:
-  linkCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: your_username/markdown-links-action@v1
-        with:
-          folder-path: 'docs'
-```
+  Check links only in the `docs` directory:
 
-### PR Specific Checks
+  ```yml
+  on: [push, pull_request]
+  name: Check Docs Links
+  jobs:
+    linkCheck:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: your_username/markdown-links-action@v1
+          with:
+            folder-path: 'docs'
+  ```
 
-Check only modified files in a pull request:
+  ### PR Specific Checks
 
-```yml
-on: [pull_request]
-name: Check Modified Markdown Links
-jobs:
-  linkCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: your_username/markdown-links-action@v1
-        with:
-          check-modified-files-only: 'yes'
-```
+  Check only modified files in a pull request:
 
-## :heart: Contributing
+  ```yml
+  on: [pull_request]
+  name: Check Modified Markdown Links
+  jobs:
+    linkCheck:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: your_username/markdown-links-action@v1
+          with:
+            check-modified-files-only: 'yes'
+  ```
 
-Interested in contributing? We welcome all contributions, big or small. Check out our [Contribution Guide](CONTRIBUTING.md) for details.
+  ## :heart: Contributing
 
-## :memo: License
+  Interested in contributing? We welcome all contributions, big or small. Check out our [Contribution Guide](CONTRIBUTING.md) for details.
+
+  ## :memo: License
 
 
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+  Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
----
+  ---
 
-<h3 align="center">
-  <br>
-  Made with 🤙 by <a href="https://github.com/dutchakdev">Roman Dutchak</a>
-  <br>
-</h3>
+  <h3 align="center">
+    <br>
+    Made with 🤙 by <a href="https://github.com/dutchakdev">Roman Dutchak</a>
+    <br>
+  </h3>

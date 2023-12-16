@@ -14,7 +14,6 @@ jest.mock('fs', () => {
     }
   }
 })
-jest.mock('markdown-link-check')
 jest.mock('@octokit/rest', () => ({
   Octokit: jest.fn()
 }))

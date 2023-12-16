@@ -103,6 +103,20 @@ export async function run(): Promise<void> {
         for (const result of results) {
           deadLinks.push(...result.deadLinks)
         }
+
+        for (const deadLink of deadLinks) {
+          // make relative pathes for files like docs/README.md
+          if (deadLink.file.startsWith(process.env.GITHUB_WORKSPACE || '')) {
+            deadLink.file = deadLink.file.replace(
+              `${process.env.GITHUB_WORKSPACE}/` || '',
+              ''
+            )
+            deadLink.link = deadLink.link.replace(
+              `${process.env.GITHUB_WORKSPACE}/` || '',
+              ''
+            )
+          }
+        }
         core.debug('All files processed.')
         core.debug(`Dead links: ${JSON.stringify(deadLinks)}`)
       } catch (error) {
@@ -118,6 +132,8 @@ export async function run(): Promise<void> {
         issueTitle.replace('{n}', deadLinks.length.toString()) + issueTitleEnd
 
       await checker()
+
+      //
 
       const issueBody = deadLinksToMarkdown(deadLinks)
       const deadLinksIssue = await findIssueWithTitle(

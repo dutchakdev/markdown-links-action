@@ -13,6 +13,7 @@ ignorePatterns:
   - '**/dist/.*'
   - '**/coverage/.*'
   - '*.json'
+  - '.releaserc'
 
 parser: '@typescript-eslint/parser'
 

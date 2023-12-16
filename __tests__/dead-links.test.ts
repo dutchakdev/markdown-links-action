@@ -39,7 +39,9 @@ describe('deadLinks', () => {
   test('deadLinksToMarkdown returns a markdown string', () => {
     const result = deadLinksToMarkdown([mockDeadLink])
     expect(result).toContain('| File | Link | Status | Emoji |')
-    expect(result).toContain(`| ${mockFile} | ${mockLink} | 404 | ☠️ |`)
+    expect(result).toContain(
+      `| mockFile.md | http://mocklink.com | ![](https://img.shields.io/badge/_404-red) | ☠️ |`
+    )
   })
 
   test('fileExists returns true for an existing file', async () => {
