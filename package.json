@@ -1,7 +1,7 @@
 {
   "name": "typescript-action",
   "description": "Markdown Links Checker Action",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Roman Dutchak",
   "private": true,
   "homepage": "https://github.com/dutchakdev/markdown-links-action",
