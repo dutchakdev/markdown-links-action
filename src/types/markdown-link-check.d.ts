@@ -1,12 +1,12 @@
 declare module 'markdown-link-check' {
-  interface Link {
+  export interface Link {
     link: string
     status: string
     statusCode: number
     error: string
   }
 
-  interface Options {
+  export interface Options {
     baseUrl?: string
     showProgressBar?: boolean
     timeout?: string

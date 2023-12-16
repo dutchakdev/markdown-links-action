@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import { Octokit } from '@octokit/rest'
-import markdownLinkCheck from 'markdown-link-check'
 import fs from 'fs'
 import path from 'path'
 import getFilesToCheck, { FileCheckOptions } from './utils/filesUtils'
@@ -12,7 +11,7 @@ import {
   Verbosity
 } from './utils/logUtils'
 import { validateAndGetConfig } from './utils/configUtils'
-import { deadLinksToMarkdown } from './utils/deadLinks'
+import { checkLinks, deadLinksToMarkdown } from './utils/deadLinks'
 import { DeadLink } from './types/types'
 
 const readFileAsync = fs.promises.readFile
@@ -115,28 +114,29 @@ export async function run(): Promise<void> {
     _info(`configFilePath: ${configFilePath}`)
 
     const deadLinks: DeadLink[] = []
-    for (const file of filesToCheck) {
+
+    const linkCheckPromises = filesToCheck.map(async file => {
       const fileContent = await readFileAsync(file, 'utf8')
       _info(`Checking links in file ${file}`)
-      markdownLinkCheck(fileContent, config, (err, results) => {
-        if (err) {
-          _error(`Error while checking links in file ${file}. Error: ${err}`)
-          return
-        }
+      try {
+        const results = await checkLinks(fileContent, config)
         for (const result of results) {
           if (result.statusCode !== 200) {
-            const link: DeadLink = {
+            deadLinks.push({
               file,
               link: result.link,
               statusCode: result.statusCode,
               status: result.status,
               error: result.error
-            }
-            deadLinks.push(link)
+            })
           }
         }
-      })
-    }
+      } catch (err) {
+        _error(`Error while checking links in file ${file}. Error: ${err}`)
+      }
+    })
+
+    await Promise.all(linkCheckPromises)
 
     _info(`Dead links: ${JSON.stringify(deadLinks)}`)
 

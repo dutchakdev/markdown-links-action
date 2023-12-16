@@ -49756,7 +49756,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = exports.createGhIssue = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const rest_1 = __nccwpck_require__(5375);
-const markdown_link_check_1 = __importDefault(__nccwpck_require__(1454));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const filesUtils_1 = __importDefault(__nccwpck_require__(7058));
@@ -49836,28 +49835,28 @@ async function run() {
         const config = await (0, configUtils_1.validateAndGetConfig)(configFilePath);
         (0, logUtils_1.info)(`configFilePath: ${configFilePath}`);
         const deadLinks = [];
-        for (const file of filesToCheck) {
+        const linkCheckPromises = filesToCheck.map(async (file) => {
             const fileContent = await readFileAsync(file, 'utf8');
             (0, logUtils_1.info)(`Checking links in file ${file}`);
-            (0, markdown_link_check_1.default)(fileContent, config, (err, results) => {
-                if (err) {
-                    (0, logUtils_1.error)(`Error while checking links in file ${file}. Error: ${err}`);
-                    return;
-                }
+            try {
+                const results = await (0, deadLinks_1.checkLinks)(fileContent, config);
                 for (const result of results) {
                     if (result.statusCode !== 200) {
-                        const link = {
+                        deadLinks.push({
                             file,
                             link: result.link,
                             statusCode: result.statusCode,
                             status: result.status,
                             error: result.error
-                        };
-                        deadLinks.push(link);
+                        });
                     }
                 }
-            });
-        }
+            }
+            catch (err) {
+                (0, logUtils_1.error)(`Error while checking links in file ${file}. Error: ${err}`);
+            }
+        });
+        await Promise.all(linkCheckPromises);
         (0, logUtils_1.info)(`Dead links: ${JSON.stringify(deadLinks)}`);
         // Set output
         core.setOutput('dead-links', JSON.stringify(deadLinks));
@@ -49963,12 +49962,16 @@ exports.validateAndGetConfig = validateAndGetConfig;
 /***/ }),
 
 /***/ 1337:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deadLinksToMarkdown = void 0;
+exports.checkLinks = exports.deadLinksToMarkdown = void 0;
+const markdown_link_check_1 = __importDefault(__nccwpck_require__(1454));
 function deadLinksToMarkdown(deadLinks) {
     let markdown = `| File | Link | Status |\n| --- | --- | --- |\n`;
     for (const deadLink of deadLinks) {
@@ -49977,6 +49980,19 @@ function deadLinksToMarkdown(deadLinks) {
     return markdown;
 }
 exports.deadLinksToMarkdown = deadLinksToMarkdown;
+async function checkLinks(fileContent, config) {
+    return new Promise((resolve, reject) => {
+        (0, markdown_link_check_1.default)(fileContent, config, (err, results) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(results);
+            }
+        });
+    });
+}
+exports.checkLinks = checkLinks;
 
 
 /***/ }),
