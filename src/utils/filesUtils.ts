@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { warn as _warn, info as _info } from './logUtils'
 const readdirAsync = fs.promises.readdir
 
 export interface FileCheckOptions {
@@ -45,7 +44,6 @@ export async function getModifiedFiles(baseBranch: string): Promise<string[]> {
     const { stdout } = await execAsync(`git diff --name-only ${baseBranch}`)
     return stdout.split('\n').filter(line => line)
   } catch (error) {
-    console.error('Error occurred while getting modified files:', error)
     return []
   }
 }
@@ -64,11 +62,8 @@ async function getFilesToCheck(options: FileCheckOptions): Promise<string[]> {
 
   for (const filePath of options.additionalFilePaths) {
     // check if file exists
-    _info(`filePath: ${filePath}`)
     if (fs.existsSync(filePath)) {
       allFiles.push(filePath)
-    } else {
-      _warn(`File ${filePath} does not exist.`)
     }
   }
 

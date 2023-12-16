@@ -1,7 +1,7 @@
 # Yo!
 
 [Broken Link](https://example.com)
-[Broken Link](https://example.com/404)
-[Broken Link](https://examplewefl;qwkjnerfgnrefgweokgn.com)
-[Broken Link](https://fdwwfefw.com)
- 
+[Broken Link](https://examplssse.com)
+[Broken Link2](https://examplsssse.com)
+[Broken Link2](https://examplsssse.com)
+[Broken Link2](https://examplsssse.com)

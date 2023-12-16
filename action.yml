@@ -7,10 +7,6 @@ branding:
   color: 'red'
 
 inputs:
-  use-verbose-mode:
-    description: 'Use yes to enable markdown-link-check verbose mode which lists additional details.'
-    required: true
-    default: 'no'
   config-file:
     description: 'Specify path to a markdown-link-check JSON configuration file.'
     required: true

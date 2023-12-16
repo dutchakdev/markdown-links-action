@@ -1,21 +1,22 @@
 {
   "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
+  "description": "Markdown Link Checker Action",
+  "version": "0.1.0",
+  "author": "Roman Dutchak",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/actions/markdown-link-action",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/actions/markdown-link-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/dutchakdev/markdown-link-action/issues"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "markdownlint",
+    "markdown"
   ],
   "exports": {
     ".": "./dist/index.js"
@@ -67,9 +68,8 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@oclif/core": "^3.14.1",
-    "@octokit/rest": "^20.0.2",
-    "markdown-link-check": "^3.11.2"
+    "async-mutex": "^0.4.0",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
