@@ -24,7 +24,7 @@ Customize the action using these variables:
 | `base-branch` | Base branch for comparing changes in PRs. | `master` |
 | `file-extension` | File extension of Markdown files to check. | `.md` |
 | `file-path` | Additional specific files to check. Use comma-separated paths. | - |
-| `create-issue` | Enable to create issues for broken links. | `no` |
+| `create-issue` | Enable to create issues for broken links. permissions: issues: write needed. | `no` |
 | `gh-assignees` | Assignees for created issues. Comma-separated GitHub usernames. | - |
 | `gh-labels` | Labels for created issues. Comma-separated list. | - |
 
