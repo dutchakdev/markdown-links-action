@@ -1,105 +1,128 @@
-# Markdown Links Action
-[![GitHub Super-Linter](https://github.com/dutchakdev/markdown-links-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/dutchakdev/markdown-links-action/actions/workflows/ci.yml/badge.svg)
-[![Check dist/](https://github.com/dutchakdev/markdown-links-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/dutchakdev/markdown-links-action/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/dutchakdev/markdown-links-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/dutchakdev/markdown-links-action/actions/workflows/codeql-analysis.yml)
-[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+<h1 align="center">
+  <br>
+  <img src="https://path_to_your_project_logo/logo.png" alt="Markdown Links Action Logo" width="200">
+  <br>
+  Markdown Links Action
+  <br>
+</h1>
 
-The Markdown Links Action automates the process of validating links in Markdown 
-files within a GitHub repository. It ensures all hyperlinks in your 
-documentation are functional and up-to-date, maintaining the integrity and 
-reliability of your project's documentation.
+<h4 align="center">A GitHub Action for validating links in Markdown files.</h4>
 
-## Configuration Variables
+<p align="center">
+  <a href="https://github.com/your_username/markdown-links-action/releases">
+    <img src="https://img.shields.io/github/v/release/your_username/markdown-links-action?style=flat-square">
+  </a>
+  <a href="https://github.com/your_username/markdown-links-action/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/your_username/markdown-links-action?style=flat-square">
+  </a>
+</p>
 
-Customize the action using these variables:
+<p align="center">
+  <a href="#overview">Overview</a> •
+  <a href="#features">Features</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#usage-examples">Usage Examples</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#license">License</a>
+</p>
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `use-verbose-mode` | Enable for detailed HTTP status of links. | `no` |
-| `config-file` | Path to a [markdown-link-check config file](https://github.com/tcort/markdown-link-check#config-file-format). Customizes link check behavior. | `mlc_config.json` |
-| `folder-path` | Specify directories to check. Use comma-separated paths for multiple directories. | `.` |
-| `max-depth` | Max depth for directory checks. `-1` for unlimited depth. | `-1` |
-| `check-modified-files-only` | Check only modified files in PRs. Uses `git` to identify changes. | `no` |
-| `base-branch` | Base branch for comparing changes in PRs. | `master` |
-| `file-extension` | File extension of Markdown files to check. | `.md` |
-| `file-path` | Additional specific files to check. Use comma-separated paths. | - |
-| `create-issue` | Enable to create issues for broken links. permissions: issues: write needed. | `no` |
-| `gh-assignees` | Assignees for created issues. Comma-separated GitHub usernames. | - |
-| `gh-labels` | Labels for created issues. Comma-separated list. | - |
+---
 
-## Disabling Link Checks
+## :clipboard: Overview
 
-Disable link checks in your Markdown files using HTML comments:
+The Markdown Links Action automates the process of validating links in Markdown files within a GitHub repository, ensuring all hyperlinks in your documentation are functional and up-to-date.
 
-1. **Disable Link Checks in a Section:**
-   Wrap the section with `<!-- markdown-link-check-disable -->` and `<!-- markdown-link-check-enable -->`.
-   ```markdown
-   <!-- markdown-link-check-disable -->
-   Ignore this [Broken Link](https://example.com)
-   <!-- markdown-link-check-enable -->
-   ```
+## :sparkles: Features
 
-2. **Disable Link Checks for Next Line:**
-   Place `<!-- markdown-link-check-disable-next-line -->` above the line.
-   ```markdown
-   <!-- markdown-link-check-disable-next-line -->
-   This [Link](https://example.com) will be ignored.
-   ```
+- **Link Validation:** Checks hyperlinks in Markdown files for validity.
+- **Customizable Folder Paths:** Specify directories to check for Markdown files.
+- **PR Specific Checks:** Option to check only modified files in pull requests.
+- **Issue Creation:** Ability to create GitHub issues for broken links.
+- **Flexible Configuration:** Configure various aspects of the action according to your project's needs.
 
-3. **Disable Link Checks for Current Line:**
-   Use `<!-- markdown-link-check-disable-line -->` in the same line.
-   ```markdown
-   This is a [Link](https://example.com) <!-- markdown-link-check-disable-line -->
-   ```
+## :gear: Configuration
 
-## Example Workflows
+Configure the action using these inputs:
 
-### Checking Links in Modified Markdown Files
+| Input                        | Description                                     | Required | Default Value       |
+|------------------------------|-------------------------------------------------|----------|---------------------|
+| `folder-path`                | Custom folder path for Markdown files.          | Yes      | `.`                 |
+| `max-depth`                  | Maximum depth for directory checks.             | Yes      | `-1`                |
+| `check-modified-files-only`  | Check only modified files if set to `yes`.      | Yes      | `no`                |
+| `base-branch`                | Base branch for comparing changes in PRs.       | Yes      | `main`              |
+| `file-extension`             | File extension of Markdown files to check.      | Yes      | `.md`               |
+| `file-path`                  | Additional specific files to check.             | Yes      |                     |
+| `create-issue`               | Create issue for broken links if set to `yes`.  | Yes      | `no`                |
+| `gh-assignees`               | Assignees for the created issues.               | No       |                     |
+| `gh-labels`                  | Labels for the created issues.                  | No       |                     |
+| `repo-token`                 | GitHub token for authentication.                | Yes      |                     |
+| `repository`                 | GitHub repository in the format `owner/repo`.   | Yes      |                     |
 
-Use this workflow to check links in modified Markdown files in a pull request:
+## :zap: Usage Examples
+
+### Basic Usage
+
+Check links in all Markdown files in the repository:
+
+```yml
+on: [push, pull_request]
+name: Markdown Link Check
+jobs:
+  linkCheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: your_username/markdown-links-action@v1
+```
+
+### Custom Folder Path
+
+Check links only in the `docs` directory:
+
+```yml
+on: [push, pull_request]
+name: Check Docs Links
+jobs:
+  linkCheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: your_username/markdown-links-action@v1
+        with:
+          folder-path: 'docs'
+```
+
+### PR Specific Checks
+
+Check only modified files in a pull request:
 
 ```yml
 on: [pull_request]
 name: Check Modified Markdown Links
 jobs:
-  markdown-link-check:
+  linkCheck:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: dutchakdev/markdown-links-action@v1
-      with:
-        check-modified-files-only: 'yes'
+      - uses: actions/checkout@v2
+      - uses: your_username/markdown-links-action@v1
+        with:
+          check-modified-files-only: 'yes'
 ```
 
-### Checking Multiple Directories and Files
+## :heart: Contributing
 
-This workflow checks links in specific directories and files:
+Interested in contributing? We welcome all contributions, big or small. Check out our [Contribution Guide](CONTRIBUTING.md) for details.
 
-```yml
-on: [push, pull_request]
-name: Check Selected Markdown Links
-jobs:
-  markdown-link-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: dutchakdev/markdown-links-action@v1
-      with:
-        folder-path: 'docs'
-        file-path: './README.md,./CONTRIBUTING.md'
-```
+## :memo: License
 
-## Tips and Notes
 
-- **PR Comparisons:** For PRs, the action compares changes with the specified `base-branch`.
-- **Custom Configurations:** Use the `config-file` to adjust link check behaviors, like ignoring certain links.
-- **Issue Creation:** If `create-issue` is enabled, issues for broken links include detailed information for quick fixes.
 
-## Contributions
-
-Your feedback and contributions are welcome! Please create an issue or pull request in the repository for any feature requests or bug reports.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ---
 
-This documentation provides a clear and comprehensive guide to configuring and using your Markdown Links Action. Tailor the examples to fit the specifics of your action's capabilities and repository settings.
+<h3 align="center">
+  <br>
+  Made with 🤙 by <a href="https://github.com/dutchakdev">Roman Dutchak</a>
+  <br>
+</h3>

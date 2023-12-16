@@ -3,5 +3,7 @@ export interface DeadLink {
   link: string
   status: string
   statusCode: number
+  statusEmo?: string
   error: string
+  commit?: string
 }
