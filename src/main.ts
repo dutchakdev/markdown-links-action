@@ -110,8 +110,9 @@ export async function run(): Promise<void> {
 
     _info(`Files to check: ${filesToCheck}`)
 
-    const configFilePath = `${process.env.GITHUB_WORKSPACE}/${configFile}`
+    const configFilePath = path.resolve(`${configFile}`)
     const config = await validateAndGetConfig(configFilePath)
+    _info(`configFilePath: ${configFilePath}`)
 
     const deadLinks: DeadLink[] = []
     for (const file of filesToCheck) {
