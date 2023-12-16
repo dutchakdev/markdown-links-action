@@ -49753,7 +49753,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = exports.createGhIssue = void 0;
+exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const rest_1 = __nccwpck_require__(5375);
 const fs_1 = __importDefault(__nccwpck_require__(7147));
@@ -49762,18 +49762,8 @@ const filesUtils_1 = __importDefault(__nccwpck_require__(7058));
 const logUtils_1 = __nccwpck_require__(2585);
 const configUtils_1 = __nccwpck_require__(3757);
 const deadLinks_1 = __nccwpck_require__(1337);
+const githubUtils_1 = __nccwpck_require__(5539);
 const readFileAsync = fs_1.default.promises.readFile;
-async function createGhIssue(octokit, owner, repo, title, body, assignees, labels) {
-    await octokit.issues.create({
-        owner,
-        repo,
-        title,
-        body,
-        assignees,
-        labels
-    });
-}
-exports.createGhIssue = createGhIssue;
 async function run() {
     try {
         // Retrieving inputs from action.yml
@@ -49861,17 +49851,24 @@ async function run() {
         // Set output
         core.setOutput('dead-links', JSON.stringify(deadLinks));
         if (createIssue) {
+            const issueTitleEnd = ' [mlc action]';
+            const fullIssueTitle = issueTitle.replace('{n}', deadLinks.length.toString()) + issueTitleEnd;
+            const issueBody = (0, deadLinks_1.deadLinksToMarkdown)(deadLinks);
             try {
                 const octokit = new rest_1.Octokit({ auth: repoToken });
-                let issueBody = (0, deadLinks_1.deadLinksToMarkdown)(deadLinks);
-                const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`;
-                const issueHeader = await readFileAsync(issueHeaderPath, 'utf8');
-                if (issueHeader) {
-                    issueBody = issueHeader + issueBody;
+                const existingIssue = await (0, githubUtils_1.findIssueWithTitle)(octokit, owner, repo, issueTitleEnd);
+                if (existingIssue) {
+                    await (0, githubUtils_1.createOrUpdateComment)(octokit, owner, repo, existingIssue.id, issueBody, 'github-actions[bot]');
+                    (0, logUtils_1.info)(`Comment updated/created successfully 🤙`);
                 }
-                (0, logUtils_1.info)(`issueBody: ${issueBody}`);
-                await createGhIssue(octokit, owner, repo, issueTitle.replace('{n}', deadLinks.length.toString()), issueBody, ghAssignees, ghLabels);
-                (0, logUtils_1.info)(`Issue created successfully 🤙`);
+                else {
+                    // Include issue header if exists
+                    const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`;
+                    const issueHeader = await readFileAsync(issueHeaderPath, 'utf8');
+                    (0, logUtils_1.info)(`issueBody: ${issueBody}`);
+                    await (0, githubUtils_1.createGhIssue)(octokit, owner, repo, `${fullIssueTitle.replace('{n}', deadLinks.length.toString())} [mlc action]`, issueHeader ? issueHeader + issueBody : issueBody, ghAssignees, ghLabels);
+                    (0, logUtils_1.info)(`Issue created successfully 🤙`);
+                }
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -50063,6 +50060,63 @@ async function getFilesToCheck(options) {
     return allFiles;
 }
 exports["default"] = getFilesToCheck;
+
+
+/***/ }),
+
+/***/ 5539:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createOrUpdateComment = exports.findIssueWithTitle = exports.createGhIssue = void 0;
+async function createGhIssue(octokit, owner, repo, title, body, assignees, labels) {
+    await octokit.issues.create({
+        owner,
+        repo,
+        title,
+        body,
+        assignees,
+        labels
+    });
+}
+exports.createGhIssue = createGhIssue;
+async function findIssueWithTitle(octokit, owner, repo, titleEnd) {
+    const issues = await octokit.rest.issues.listForRepo({
+        owner,
+        repo,
+        state: 'open'
+    });
+    return issues.data.find((issue) => issue.title.endsWith(titleEnd));
+}
+exports.findIssueWithTitle = findIssueWithTitle;
+async function createOrUpdateComment(octokit, owner, repo, issueNumber, body, botUsername) {
+    const comments = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: issueNumber
+    });
+    // Find the bot's comment, ensuring that 'user' is not null
+    const botComment = comments.data.find(comment => comment.user && comment.user.login === botUsername);
+    if (botComment) {
+        await octokit.rest.issues.updateComment({
+            owner,
+            repo,
+            comment_id: botComment.id,
+            body
+        });
+    }
+    else {
+        await octokit.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: issueNumber,
+            body
+        });
+    }
+}
+exports.createOrUpdateComment = createOrUpdateComment;
 
 
 /***/ }),

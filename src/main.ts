@@ -13,9 +13,12 @@ import {
 import { validateAndGetConfig } from './utils/configUtils'
 import { checkLinks, deadLinksToMarkdown } from './utils/deadLinks'
 import { DeadLink } from './types/types'
-import { createGhIssue, findIssueWithTitle, createOrUpdateComment } from './utils/githubUtils'
+import {
+  createGhIssue,
+  findIssueWithTitle,
+  createOrUpdateComment
+} from './utils/githubUtils'
 const readFileAsync = fs.promises.readFile
-
 
 export async function run(): Promise<void> {
   try {
@@ -126,29 +129,51 @@ export async function run(): Promise<void> {
     core.setOutput('dead-links', JSON.stringify(deadLinks))
 
     if (createIssue) {
-      const issueTitleEnd = " [mlc action]";
-      const fullIssueTitle = issueTitle.replace('{n}', deadLinks.length.toString()) + issueTitleEnd;
-      let issueBody = deadLinksToMarkdown(deadLinks);
+      const issueTitleEnd = ' [mlc action]'
+      const fullIssueTitle =
+        issueTitle.replace('{n}', deadLinks.length.toString()) + issueTitleEnd
+      const issueBody = deadLinksToMarkdown(deadLinks)
 
       try {
         const octokit = new Octokit({ auth: repoToken })
-
-        const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`
-        const issueHeader = await readFileAsync(issueHeaderPath, 'utf8')
-
-        const existingIssue = await findIssueWithTitle(octokit, owner, repo, issueTitleEnd);
-
-
-        await createGhIssue(
+        const existingIssue = await findIssueWithTitle(
           octokit,
           owner,
           repo,
-          issueTitle.replace('{n}', deadLinks.length.toString()) + ' [mlc action]',
-          issueHeader ? issueHeader + issueBody : issueBody,
-          ghAssignees,
-          ghLabels
+          issueTitleEnd
         )
-        _info(`Issue created successfully 🤙`)
+
+        if (existingIssue) {
+          await createOrUpdateComment(
+            octokit,
+            owner,
+            repo,
+            existingIssue.id,
+            issueBody,
+            'github-actions[bot]'
+          )
+          _info(`Comment updated/created successfully 🤙`)
+        } else {
+          // Include issue header if exists
+          const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`
+          const issueHeader = await readFileAsync(issueHeaderPath, 'utf8')
+
+          _info(`issueBody: ${issueBody}`)
+
+          await createGhIssue(
+            octokit,
+            owner,
+            repo,
+            `${fullIssueTitle.replace(
+              '{n}',
+              deadLinks.length.toString()
+            )} [mlc action]`,
+            issueHeader ? issueHeader + issueBody : issueBody,
+            ghAssignees,
+            ghLabels
+          )
+          _info(`Issue created successfully 🤙`)
+        }
       } catch (error) {
         if (error instanceof Error) {
           _error(`Error while creating issue: ${error.message}`)

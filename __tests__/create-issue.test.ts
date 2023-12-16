@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest'
-import { createGhIssue } from '../src/main'
+import { createGhIssue } from '../src/utils/githubUtils'
 
 describe('createIssue', () => {
   it('should create an issue', async () => {
