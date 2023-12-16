@@ -61,7 +61,7 @@ inputs:
     default: ''
 
 outputs:
-  bad-links:
+  dead-links:
     description: 'List of broken links'
 
 runs:

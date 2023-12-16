@@ -60,7 +60,10 @@ jobs:
           use-verbose-mode: 'yes'
           folder-path: 'docs'
           file-path: './README.md,./CONTRIBUTING.md'
+          create-issue: 'yes'
+          gh-assignees: 'dutchakdev'
+          gh-labels: 'dead-links'
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.bad-links }}"
+        run: echo "${{ steps.test-action.outputs.dead-links }}"
