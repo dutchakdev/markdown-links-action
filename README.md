@@ -103,3 +103,5 @@ Your feedback and contributions are welcome! Please create an issue or pull requ
 ---
 
 This documentation provides a clear and comprehensive guide to configuring and using your Markdown Links Action. Tailor the examples to fit the specifics of your action's capabilities and repository settings.
+
+[Broken Link](https://examplewefl;qwkjnerfgnrefgweokgn.com)
