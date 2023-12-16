@@ -13,27 +13,9 @@ import {
 import { validateAndGetConfig } from './utils/configUtils'
 import { checkLinks, deadLinksToMarkdown } from './utils/deadLinks'
 import { DeadLink } from './types/types'
-
+import { createGhIssue, findIssueWithTitle, createOrUpdateComment } from './utils/githubUtils'
 const readFileAsync = fs.promises.readFile
 
-export async function createGhIssue(
-  octokit: Octokit,
-  owner: string,
-  repo: string,
-  title: string,
-  body: string,
-  assignees: string[],
-  labels: string[]
-): Promise<void> {
-  await octokit.issues.create({
-    owner,
-    repo,
-    title,
-    body,
-    assignees,
-    labels
-  })
-}
 
 export async function run(): Promise<void> {
   try {
@@ -144,22 +126,25 @@ export async function run(): Promise<void> {
     core.setOutput('dead-links', JSON.stringify(deadLinks))
 
     if (createIssue) {
+      const issueTitleEnd = " [mlc action]";
+      const fullIssueTitle = issueTitle.replace('{n}', deadLinks.length.toString()) + issueTitleEnd;
+      let issueBody = deadLinksToMarkdown(deadLinks);
+
       try {
         const octokit = new Octokit({ auth: repoToken })
-        let issueBody = deadLinksToMarkdown(deadLinks)
+
         const issueHeaderPath = `${process.env.GITHUB_WORKSPACE}/.mdl-issue-header.md`
         const issueHeader = await readFileAsync(issueHeaderPath, 'utf8')
-        if (issueHeader) {
-          issueBody = issueHeader + issueBody
-        }
-        _info(`issueBody: ${issueBody}`)
+
+        const existingIssue = await findIssueWithTitle(octokit, owner, repo, issueTitleEnd);
+
 
         await createGhIssue(
           octokit,
           owner,
           repo,
-          issueTitle.replace('{n}', deadLinks.length.toString()),
-          issueBody,
+          issueTitle.replace('{n}', deadLinks.length.toString()) + ' [mlc action]',
+          issueHeader ? issueHeader + issueBody : issueBody,
           ghAssignees,
           ghLabels
         )
