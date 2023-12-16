@@ -49832,11 +49832,13 @@ async function run() {
         (0, logUtils_1.info)(`FileCheckOptions options: ${JSON.stringify(options)}`);
         const filesToCheck = await (0, filesUtils_1.default)(options);
         (0, logUtils_1.info)(`Files to check: ${filesToCheck}`);
-        const configFilePath = `${process.env.GITHUB_WORKSPACE}/${configFile}`;
+        const configFilePath = path_1.default.resolve(`${configFile}`);
         const config = await (0, configUtils_1.validateAndGetConfig)(configFilePath);
+        (0, logUtils_1.info)(`configFilePath: ${configFilePath}`);
         const deadLinks = [];
         for (const file of filesToCheck) {
             const fileContent = await readFileAsync(file, 'utf8');
+            (0, logUtils_1.info)(`Checking links in file ${file}`);
             (0, markdown_link_check_1.default)(fileContent, config, (err, results) => {
                 if (err) {
                     (0, logUtils_1.error)(`Error while checking links in file ${file}. Error: ${err}`);
@@ -49856,6 +49858,7 @@ async function run() {
                 }
             });
         }
+        (0, logUtils_1.info)(`Dead links: ${JSON.stringify(deadLinks)}`);
         // Set output
         core.setOutput('dead-links', JSON.stringify(deadLinks));
         if (createIssue) {
@@ -49915,6 +49918,7 @@ async function configExists(configFile) {
 exports.configExists = configExists;
 async function getConfig(configFile) {
     const fileContent = await readFileAsync(configFile, 'utf8');
+    console.log(`Config file content: ${fileContent}`);
     return JSON.parse(fileContent);
 }
 exports.getConfig = getConfig;
@@ -49931,8 +49935,11 @@ async function isValidJson(filePath) {
 exports.isValidJson = isValidJson;
 async function validateAndGetConfig(configFilePath) {
     try {
+        console.log(`Reading config file from ${configFilePath}`);
         if (await configExists(configFilePath)) {
+            console.log(`Config file found at ${configFilePath}`);
             if (await isValidJson(configFilePath)) {
+                console.log(`Config file is valid JSON`);
                 return await getConfig(configFilePath);
             }
             else {

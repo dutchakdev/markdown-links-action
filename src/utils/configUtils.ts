@@ -15,6 +15,7 @@ export async function getConfig(
   configFile: string
 ): Promise<Record<string, unknown>> {
   const fileContent = await readFileAsync(configFile, 'utf8')
+  console.log(`Config file content: ${fileContent}`)
   return JSON.parse(fileContent)
 }
 
@@ -32,8 +33,11 @@ export async function validateAndGetConfig(
   configFilePath: string
 ): Promise<Record<string, unknown>> {
   try {
+    console.log(`Reading config file from ${configFilePath}`)
     if (await configExists(configFilePath)) {
+      console.log(`Config file found at ${configFilePath}`)
       if (await isValidJson(configFilePath)) {
+        console.log(`Config file is valid JSON`)
         return await getConfig(configFilePath)
       } else {
         throw new Error('Invalid config file format. Expected JSON format.')

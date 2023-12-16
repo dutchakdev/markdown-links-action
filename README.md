@@ -1,4 +1,9 @@
 # Markdown Links Action
+[![GitHub Super-Linter](https://github.com/dutchakdev/markdown-links-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/dutchakdev/markdown-links-action/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/dutchakdev/markdown-links-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/dutchakdev/markdown-links-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/dutchakdev/markdown-links-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/dutchakdev/markdown-links-action/actions/workflows/codeql-analysis.yml)
+[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 The Markdown Links Action automates the process of validating links in Markdown 
 files within a GitHub repository. It ensures all hyperlinks in your 
