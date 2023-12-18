@@ -1,3 +1,10 @@
+## [0.1.2](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.1...v0.1.2) (2023-12-18)
+
+
+### Bug Fixes
+
+* Add CONTRIBUTING.md ([4bf6c38](https://github.com/dutchakdev/markdown-links-action/commit/4bf6c3878eaf2b2b9b78e602c692313267c4020b))
+
 ## [0.1.1](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.0...v0.1.1) (2023-12-16)
 
 
