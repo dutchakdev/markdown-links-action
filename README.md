@@ -12,10 +12,10 @@
 
   <p align="center">
     <a href="https://github.com/your_username/markdown-links-action/releases">
-      <img src="https://img.shields.io/github/v/release/your_username/markdown-links-action?style=flat-square">
+      <img src="https://img.shields.io/github/v/release/dutchakdev/markdown-links-action?style=flat-square">
     </a>
     <a href="https://github.com/your_username/markdown-links-action/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/your_username/markdown-links-action?style=flat-square">
+      <img src="https://img.shields.io/github/license/dutchakdev/markdown-links-action?style=flat-square">
     </a>
   </p>
 
