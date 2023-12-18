@@ -1,3 +1,10 @@
+## [0.1.4](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.3...v0.1.4) (2023-12-18)
+
+
+### Bug Fixes
+
+* **.github:** Add templates, docs ([547feb0](https://github.com/dutchakdev/markdown-links-action/commit/547feb0431cffd9a6773166e280f48762957c25f))
+
 ## [0.1.3](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.2...v0.1.3) (2023-12-18)
 
 
