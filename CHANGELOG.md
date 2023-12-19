@@ -1,3 +1,10 @@
+## [0.1.8](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.7...v0.1.8) (2023-12-19)
+
+
+### Bug Fixes
+
+* add badges ([eefcc16](https://github.com/dutchakdev/markdown-links-action/commit/eefcc164a77a0e3add7c2b5cf9c2d8901720fd4e))
+
 ## [0.1.7](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.6...v0.1.7) (2023-12-19)
 
 
