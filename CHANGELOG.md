@@ -1,3 +1,10 @@
+## [0.1.9](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.8...v0.1.9) (2023-12-19)
+
+
+### Bug Fixes
+
+* links ([11511d9](https://github.com/dutchakdev/markdown-links-action/commit/11511d9fc982bf279c5a254b447376ed209adbdc))
+
 ## [0.1.8](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.7...v0.1.8) (2023-12-19)
 
 
