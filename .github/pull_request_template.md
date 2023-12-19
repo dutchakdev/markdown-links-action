@@ -13,7 +13,7 @@ Before submitting your PR, please make sure to check the applicable boxes below:
 - [ ] To the best of my knowledge, this package has not been previously listed here.
 - [ ] I have thoroughly reviewed the [Contribution Guidelines](https://github.com/dutchakdev/awesome-vpn/blob/main/CONTRIBUTING.md#contribution-guidelines), [Maintainers Note](https://github.com/dutchakdev/awesome-vpn/blob/main/CONTRIBUTING.md#maintainers), and [Quality Standards](https://github.com/dutchakdev/awesome-vpn/blob/main/CONTRIBUTING.md#quality-standards).
 - [ ] The repository has a continuous integration process that runs automated tests before merging new pull requests.
-- [ ] Continuous integration is used to identify and address issues before releasing the package to end-users.
+- [ ] Continuous integration is used to identify and address issues before releasing the package to end users.
 
 We appreciate your contribution, and thank you for being awesome! :+1:
 
