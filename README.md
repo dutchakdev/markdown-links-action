@@ -17,6 +17,12 @@
     <a href="https://github.com/your_username/markdown-links-action/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/dutchakdev/markdown-links-action?style=flat-square">
     </a>
+    <a href="https://github.com/dutchakdev/markdown-links-action/actions/workflows/release.yml">
+      <img src="https://github.com/dutchakdev/markdown-links-action/actions/workflows/release.yml/badge.svg?branch=main"/>
+    </a>
+    <a href="https://github.com/dutchakdev/markdown-links-action/actions/workflows/ci.yml">
+      <img src="https://github.com/dutchakdev/markdown-links-action/actions/workflows/ci.yml/badge.svg?branch=main"/>
+    </a>
   </p>
 
   <p align="center">
