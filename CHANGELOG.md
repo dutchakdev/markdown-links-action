@@ -1,3 +1,10 @@
+## [0.1.7](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.6...v0.1.7) (2023-12-19)
+
+
+### Bug Fixes
+
+* **release.yml:** fix lint, disable natural language ([53ade8f](https://github.com/dutchakdev/markdown-links-action/commit/53ade8f6e628397cb6364bd8fadc877e3a3e7f28))
+
 ## [0.1.6](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.5...v0.1.6) (2023-12-19)
 
 
