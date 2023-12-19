@@ -26,12 +26,12 @@
   </p>
 
   <p align="center">
-    <a href="#overview">Overview</a> •
-    <a href="#features">Features</a> •
-    <a href="#configuration">Configuration</a> •
-    <a href="#usage-examples">Usage Examples</a> •
-    <a href="#contributing">Contributing</a> •
-    <a href="#license">License</a>
+    <a href="#clipboard-overview">Overview</a> •
+    <a href="#sparkles-features">Features</a> •
+    <a href="#gear-configuration">Configuration</a> •
+    <a href="#zap-usage-examples">Usage Examples</a> •
+    <a href="#heart-contributing">Contributing</a> •
+    <a href="#memo-license">License</a>
   </p>
 
   ---
