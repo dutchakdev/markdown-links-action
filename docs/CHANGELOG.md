@@ -1,3 +1,10 @@
+## [0.1.5](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.4...v0.1.5) (2023-12-19)
+
+
+### Bug Fixes
+
+* **release.yml:** fix lint ([5fea61a](https://github.com/dutchakdev/markdown-links-action/commit/5fea61a960db109ac0112d7cda0a5d6967b367a8))
+
 ## [0.1.4](https://github.com/dutchakdev/markdown-links-action/compare/v0.1.3...v0.1.4) (2023-12-18)
 
 
